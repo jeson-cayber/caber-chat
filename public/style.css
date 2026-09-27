@@ -1,0 +1,145 @@
+body {
+    background-color: #0b0f19;
+    color: #00ff66;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+}
+
+.panel {
+    background: #111827;
+    border: 1px solid #1f293d;
+    box-shadow: 0 0 20px rgba(0, 255, 102, 0.15);
+    border-radius: 10px;
+    padding: 25px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.hidden { display: none !important; }
+
+h2 {
+    color: #00ff66;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.field {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #a3b8cc;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    background: #0b0f19;
+    border: 1px solid #00ff6644;
+    color: #ffffff;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #00ff66;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #00ff66;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #00cc52;
+}
+
+/* Chat Screen */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1f293d;
+    margin-bottom: 15px;
+    color: #a3b8cc;
+}
+
+.status-badge {
+    color: #00ff66;
+    font-size: 13px;
+}
+
+.message-box {
+    height: 350px;
+    overflow-y: auto;
+    border: 1px solid #1f293d;
+    background: #0b0f19;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.msg-item {
+    padding: 10px 14px;
+    border-radius: 8px;
+    max-width: 75%;
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.msg-item.self {
+    align-self: flex-start;
+    background: #00ff6622;
+    color: #ffffff;
+    border: 1px solid #00ff6666;
+}
+
+.msg-item.other {
+    align-self: flex-end;
+    background: #1f293d;
+    color: #ffffff;
+    border: 1px solid #374151;
+}
+
+.msg-item.system {
+    align-self: center;
+    background: transparent;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+}
+
+.input-area input {
+    flex: 1;
+}
+
+.input-area button {
+    width: auto;
+    padding: 0 20px;
+}

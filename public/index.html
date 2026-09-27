@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE CYBER NODE // CHAT</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- مكتبة CryptoJS للتشفير المحلي -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+    <!-- شاشة الانضمام للغرفة وتحديد مفتاح التشفير -->
+    <div id="auth-screen" class="panel">
+        <h2>🔒 بوابة الاتصال المشفرة</h2>
+        <div class="field">
+            <label>اسم المستخدم (Codename):</label>
+            <input type="text" id="username" placeholder="مثال: Operator_01">
+        </div>
+        <div class="field">
+            <label>معرف القناة / الغرفة (Room ID):</label>
+            <input type="text" id="room-id" placeholder="مثال: RedTeam_Room1">
+        </div>
+        <div class="field">
+            <label>مفتاح التشفير السري (AES Secret Key):</label>
+            <input type="password" id="secret-key" placeholder="كلمة سر مشتركة للتشفير">
+        </div>
+        <button onclick="connectChannel()">تأسيس الاتصال ⚡</button>
+    </div>
+
+    <!-- شاشة الدردشة الرئيسيّة -->
+    <div id="chat-screen" class="panel hidden">
+        <div class="chat-header">
+            <div>القناة الحالية: <span id="display-room"></span></div>
+            <div class="status-badge">● التشفير فعال (AES-256)</div>
+        </div>
+
+        <div id="message-box" class="message-box"></div>
+
+        <div class="input-area">
+            <input type="text" id="message-input" placeholder="اكتب رسالتك المشفرة هنا..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">إرسال 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let currentRoom = '';
+        let secretKey = '';
+        let myUsername = '';
+
+        function connectChannel() {
+            myUsername = document.getElementById('username').value.trim() || 'Anonymous';
+            currentRoom = document.getElementById('room-id').value.trim();
+            secretKey = document.getElementById('secret-key').value;
+
+            if (!currentRoom || !secretKey) {
+                alert('الرجاء إدخال معرف الغرفة ومفتاح التشفير!');
+                return;
+            }
+
+            // الانضمام عبر Socket
+            socket.emit('join-room', currentRoom);
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+            document.getElementById('display-room').innerText = currentRoom;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const plainText = input.value.trim();
+
+            if (!plainText) return;
+
+            // تشفير النص داخل المتصفح باستخدام AES
+            const encryptedText = CryptoJS.AES.encrypt(plainText, secretKey).toString();
+
+            socket.emit('encrypted-message', {
+                roomId: currentRoom,
+                sender: myUsername,
+                encryptedPayload: encryptedText
+            });
+
+            input.value = '';
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        // استقبال الرسائل وفك تشفيرها
+        socket.on('receive-message', (data) => {
+            const box = document.getElementById('message-box');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg-item ' + (data.sender === myUsername ? 'self' : 'other');
+
+            let decryptedText = '[خطأ: فشل فك التشفير / مفتاح غير صحيح]';
+            try {
+                const bytes = CryptoJS.AES.decrypt(data.encryptedPayload, secretKey);
+                const originalText = bytes.toString(CryptoJS.enc.Utf8);
+                if (originalText) decryptedText = originalText;
+            } catch (err) {
+                console.error('Decryption Error:', err);
+            }
+
+            msgDiv.innerHTML = `<strong>${data.sender}:</strong> ${decryptedText}`;
+            box.appendChild(msgDiv);
+            box.scrollTop = box.scrollHeight;
+        });
+
+        socket.on('sys-message', (msg) => {
+            const box = document.getElementById('message-box');
+            const sysDiv = document.createElement('div');
+            sysDiv.className = 'msg-item system';
+            sysDiv.innerText = msg;
+            box.appendChild(sysDiv);
+            box.scrollTop = box.scrollHeight;
+        });
+    </script>
+</body>
+</html>
